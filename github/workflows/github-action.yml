@@ -1,0 +1,87 @@
+name: github-action
+run-name: ${{ github.actor }} is out building GitHub Actions
+
+on:
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '**' 
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build Maven Projects
+        run: |
+          mvn clean package -f ./WriterManagement/pom.xml
+          mvn clean package -f ./ContentPublication/pom.xml
+          mvn clean package -f ./SubscriptionAndPoint/pom.xml
+          mvn clean package -f ./AIServices/pom.xml
+          mvn clean package -f ./PlatformOrchestration/pom.xml
+
+      - name: Docker Build and push for WriterManagement
+        uses: docker/build-push-action@v4
+        with:
+          context: ./WriterManagement
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/writermanagement:latest
+            ghcr.io/${{ github.repository }}/writermanagement:${{ github.ref_name }}
+            
+      - name: Docker Build and push for ContentPublication
+        uses: docker/build-push-action@v4
+        with:
+          context: ./ContentPublication
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/contentpublication:latest
+            ghcr.io/${{ github.repository }}/contentpublication:${{ github.ref_name }}
+            
+      - name: Docker Build and push for SubscriptionAndPoint
+        uses: docker/build-push-action@v4
+        with:
+          context: ./SubscriptionAndPoint
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/subscriptionandpoint:latest
+            ghcr.io/${{ github.repository }}/subscriptionandpoint:${{ github.ref_name }}
+            
+      - name: Docker Build and push for AiServices
+        uses: docker/build-push-action@v4
+        with:
+          context: ./AIServices
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/aiservices:latest
+            ghcr.io/${{ github.repository }}/aiservices:${{ github.ref_name }}
+            
+      - name: Docker Build and push for PlatformOrchestration
+        uses: docker/build-push-action@v4
+        with:
+          context: ./PlatformOrchestration
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/platformorchestration:latest
+            ghcr.io/${{ github.repository }}/platformorchestration:${{ github.ref_name }}
+            

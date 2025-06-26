@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: WriterManagement
+  labels:
+    app: WriterManagement
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: WriterManagement

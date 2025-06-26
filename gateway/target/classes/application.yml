@@ -1,0 +1,92 @@
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  cloud:
+    gateway:
+#<<< API Gateway / Routes
+      routes:
+        - id: WriterManagement
+          uri: http://localhost:8082
+          predicates:
+            - Path=/writerProfiles/**, /portfolios/**, /writerRegistrationLists/**, /writerRegistrationDetails/**, /portfolioDetails/**, /portfolioLists/**
+        - id: ContentPublication
+          uri: http://localhost:8083
+          predicates:
+            - Path=/contents/**, /publicationRequests/**, /publicationMetadata/**, /contentDraftLists/**, /contentDetails/**, /publicationRequestHistories/**, /contentFinalLists/**, /publicationMetadataDetails/**, /publicationMetadataLists/**
+        - id: SubscriptionAndPoint
+          uri: http://localhost:8084
+          predicates:
+            - Path=/promotionMessages/**, /users/**, /pointWallets/**, /subscriptions/**, /promotionMessageHistories/**, /promotionMessageCurrents/**, /userPointHistories/**, /userProfiles/**, /pointWalletBalances/**, /pointWalletHistories/**, /subscriptionStatuses/**, /subscriptionHistories/**
+        - id: AIServices
+          uri: http://localhost:8085
+          predicates:
+            - Path=/coverImages/**, /summaries/**, /convertedManuscripts/**, /categoryAndFees/**, /summaryDetails/**, /convertedManuscriptDetails/**, /convertedManuscriptLists/**, /categoryAndFeeDetails/**, /categoryAndFeeLists/**, /coverImageDetails/**
+        - id: PlatformOrchestration
+          uri: http://localhost:8086
+          predicates:
+            - Path=/books/**, /badges/**, /bookLists/**, /badgeHistories/**
+        - id: frontend
+          uri: http://localhost:8080
+          predicates:
+            - Path=/**
+#>>> API Gateway / Routes
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  cloud:
+    gateway:
+      routes:
+        - id: WriterManagement
+          uri: http://writerManagement:8080
+          predicates:
+            - Path=/writerProfiles/**, /portfolios/**, 
+        - id: ContentPublication
+          uri: http://contentPublication:8080
+          predicates:
+            - Path=/contents/**, /publicationRequests/**, /publicationMetadata/**, 
+        - id: SubscriptionAndPoint
+          uri: http://subscriptionAndPoint:8080
+          predicates:
+            - Path=/promotionMessages/**, /users/**, /pointWallets/**, /subscriptions/**, 
+        - id: AIServices
+          uri: http://aiServices:8080
+          predicates:
+            - Path=/coverImages/**, /summaries/**, /convertedManuscripts/**, /categoryAndFees/**, 
+        - id: PlatformOrchestration
+          uri: http://platformOrchestration:8080
+          predicates:
+            - Path=/books/**, /badges/**, 
+        - id: frontend
+          uri: http://frontend:8080
+          predicates:
+            - Path=/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8080
